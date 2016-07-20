@@ -59,6 +59,9 @@ namespace nP{
 		*x = sumX;
 		*y = sumY;
 		*d = atan2(dy, dx);
+		lastX = *x;
+		lastY = *y;
+		lastD = *d;
 	}
 
 	void ParticleFilter::weight(double x, double y, double d){
@@ -73,7 +76,7 @@ namespace nP{
 			sumWeight += particles[i].w;
 		}
 
-		// Normalize
+		// Normalize weights
 		for(int i = 0; i < particleCount; i++){
 			particles[i].w /= sumWeight;
 		}
@@ -82,13 +85,23 @@ namespace nP{
 	void ParticleFilter::predict(){
 		// Noise, Linear motion ... etc
 
-		std::normal_distribution<> xyDist(0.0, 5.0);
+		std::normal_distribution<> xyDist(0.0, 10.0);
 		std::normal_distribution<> dDist(0.0, 10.0*M_PI/180.0);
 
 		for(int i = 0; i < particleCount; i++){
 			particles[i].x += xyDist(rnd);
 			particles[i].y += xyDist(rnd);
 			particles[i].d += dDist(rnd);
+
+			particles[i].x += cos(lastD);
+			particles[i].y += sin(lastD);
+
+			if(particles[i].x < xMin)particles[i].x = xMin;
+			if(xMax < particles[i].x)particles[i].x = xMax;
+			if(particles[i].y < yMin)particles[i].y = yMin;
+			if(yMax < particles[i].y)particles[i].y = yMax;
+			if(particles[i].d < 0.0)particles[i].d += 2.0*M_PI;
+			if(2.0*M_PI < particles[i].d)particles[i].d -= 2.0*M_PI;
 		}
 	}
 
@@ -122,10 +135,14 @@ namespace nP{
 	}
 
 	double dirDiff(double dir1, double dir2){
-		double x, y;
-		x = cos(dir1) + cos(dir2);
-		y = sin(dir1) + sin(dir2);
-		if(x == 0.0 && y == 0.0)return 0.0;
-		return 2.0 * (atan2(y, x) - dir1);
+		double tmp = dir2 - dir1;
+
+		while(tmp < -M_PI){
+			tmp += 2.0 * M_PI;
+		}
+		while(M_PI < tmp){
+			tmp -= 2.0 * M_PI;
+		}
+		return tmp;
 	}
 };

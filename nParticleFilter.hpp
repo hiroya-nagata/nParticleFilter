@@ -19,6 +19,7 @@ namespace nP{
 		static const double xMin, xMax;
 		static const double yMin, yMax;
 		static const double dMin, dMax;
+		double lastX, lastY, lastD;
 
 		std::vector<Particle> particles;
 		std::mt19937 rnd; // Randomizer

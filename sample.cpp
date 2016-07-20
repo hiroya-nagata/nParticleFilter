@@ -47,9 +47,9 @@ int main(){
 	while(true){
 		frame++;
 
-		tgtX = 150.0 * cos(-frame / 200.0) + 200.0;
-		tgtY = 150.0 * sin(-frame / 200.0) + 200.0;
-		tgtD = -frame / 200.0 - M_PI/2;
+		tgtX = 150.0 * cos(frame / 50.0) + 200.0;
+		tgtY = 150.0 * sin(frame / 50.0) + 200.0;
+		tgtD = frame / 50.0 + M_PI/2;
 		if(distP(rnd) < 20){ // 5% chance
 			tgtX += dist(rnd);
 			tgtY += dist(rnd);
@@ -61,7 +61,7 @@ int main(){
 		draw(img, p, tgtX, tgtY, tgtD, estX, estY, estD);
 
 		cv::imshow("img", img);
-		char k = cv::waitKey(100);
+		char k = cv::waitKey(10);
 		if(k == 27)break; // Esc key
 	}
 }
